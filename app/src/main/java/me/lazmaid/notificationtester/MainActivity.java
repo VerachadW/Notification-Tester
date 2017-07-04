@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import me.lazmaid.notificationtester.notification.NotificationProvider;
+
 public class MainActivity extends AppCompatActivity {
 
     EditText messageView;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final NotificationChannelProvider provider = NotificationChannelProvider.getInstnace();
+        final NotificationProvider provider = NotificationProvider.getInstnace();
 
         notificationManager.createNotificationChannels(provider.getChannels());
 
@@ -55,12 +57,8 @@ public class MainActivity extends AppCompatActivity {
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 notificationCount++;
-                Notification notification = new Notification.Builder(MainActivity.this, provider.getChannelIdFromName(currentNotificationChannelName))
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle(currentNotificationChannelName)
-                        .setContentText(messageView.getText())
-                        .setNumber(notificationCount)
-                        .build();
+                Notification notification = provider.buildNotification(MainActivity.this, currentNotificationChannelName,
+                        messageView.getText().toString());
                 notificationManager.notify(notificationCount, notification);
             }
         });
