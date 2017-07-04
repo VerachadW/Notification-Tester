@@ -22,13 +22,17 @@ import me.lazmaid.notificationtester.R;
 public final class NotificationProvider {
     private static NotificationProvider instance;
 
+    private static final String PUBLIC_CHANNEL = "Public";
+    private static final String PRIVATE_CHANNEL = "Private";
+    private static final String DIRECT_CHANNEL = "Direct";
+
     private Map<String, NotificationChannelModel> channelModelMap;
 
     private NotificationProvider() {
         channelModelMap = new HashMap<>();
-        channelModelMap.put("Public", createPublicGroupMessageChannel());
-        channelModelMap.put("Private", createPrivateGroupMessageChannel());
-        channelModelMap.put("Direct", createDirectMessageChannel());
+        channelModelMap.put(PUBLIC_CHANNEL, createPublicGroupMessageChannel());
+        channelModelMap.put(PRIVATE_CHANNEL, createPrivateGroupMessageChannel());
+        channelModelMap.put(DIRECT_CHANNEL, createDirectMessageChannel());
     }
 
     public static NotificationProvider getInstnace() {
@@ -55,13 +59,13 @@ public final class NotificationProvider {
     }
 
     private NotificationChannelModel createPublicGroupMessageChannel() {
-        NotificationChannel channel = createNotificationChannel("Public", NotificationManager.IMPORTANCE_LOW);
+        NotificationChannel channel = createNotificationChannel(PUBLIC_CHANNEL, NotificationManager.IMPORTANCE_LOW);
         channel.setShowBadge(true);
         return new NotificationChannelModel(channel);
     }
 
     private NotificationChannelModel createPrivateGroupMessageChannel() {
-        NotificationChannel channel = createNotificationChannel("Private", NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = createNotificationChannel(PRIVATE_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT);
         channel.enableLights(true);
         channel.setShowBadge(true);
         channel.setLightColor(Color.BLUE);
@@ -69,7 +73,7 @@ public final class NotificationProvider {
     }
 
     private NotificationChannelModel createDirectMessageChannel() {
-        NotificationChannel channel = createNotificationChannel("Direct", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel channel = createNotificationChannel(DIRECT_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
         channel.enableLights(true);
         channel.setShowBadge(true);
         channel.setLightColor(Color.RED);
@@ -89,12 +93,12 @@ public final class NotificationProvider {
                 .setContentText(text);
 
         switch (currentNotificationChannelName) {
-            case "Public":
-            case "Private":
+            case PUBLIC_CHANNEL:
+            case PRIVATE_CHANNEL:
                 builder.addAction(createAction(context, Constants.SNOOZE_REQ_CODE, R.drawable.ic_snooze_black_24dp,
                         Constants.SNZOOE_ACTION));
                 break;
-            case "Direct":
+            case DIRECT_CHANNEL:
                 builder.addAction(createAction(context, Constants.REPLY_REQ_CODE, R.drawable.ic_reply_black_24dp,
                         Constants.REPLY_ACTION));
                 builder.addAction(createAction(context, Constants.BLOCK_REQ_CODE, R.drawable.ic_block_black_24dp, Constants.BLOCK_ACTON));

@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
 import me.lazmaid.notificationtester.notification.NotificationProvider;
+import me.lazmaid.notificationtester.notification.NotificationProviderKt;
 
 public class MainActivity extends AppCompatActivity {
 
