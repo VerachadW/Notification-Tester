@@ -26,13 +26,19 @@ public final class NotificationProvider {
     private static final String PRIVATE_CHANNEL = "Private";
     private static final String DIRECT_CHANNEL = "Direct";
 
-    private Map<String, NotificationChannelModel> channelModelMap;
+    private Map<String, NotificationChannel> channelModelMap;
+    private Map<String, Integer> channelCountMap;
 
     private NotificationProvider() {
         channelModelMap = new HashMap<>();
         channelModelMap.put(PUBLIC_CHANNEL, createPublicGroupMessageChannel());
         channelModelMap.put(PRIVATE_CHANNEL, createPrivateGroupMessageChannel());
         channelModelMap.put(DIRECT_CHANNEL, createDirectMessageChannel());
+
+        channelCountMap = new HashMap<>();
+        channelCountMap.put(PUBLIC_CHANNEL, 0);
+        channelCountMap.put(PRIVATE_CHANNEL, 0);
+        channelCountMap.put(DIRECT_CHANNEL, 0);
     }
 
     public static NotificationProvider getInstnace() {
@@ -43,42 +49,38 @@ public final class NotificationProvider {
     }
 
     public List<NotificationChannel> getChannels() {
-        List<NotificationChannel> channels = new ArrayList<>();
-        for (NotificationChannelModel model : channelModelMap.values()) {
-            channels.add(model.getChannel());
-        }
-        return channels;
+        return new ArrayList<>(channelModelMap.values());
     }
 
     public String getChannelIdFromName(String name) {
-        return channelModelMap.get(name).getChannel().getId();
+        return channelModelMap.get(name).getId();
     }
 
     public String[] getChannelNames() {
         return channelModelMap.keySet().toArray(new String[channelModelMap.size()]);
     }
 
-    private NotificationChannelModel createPublicGroupMessageChannel() {
+    private NotificationChannel createPublicGroupMessageChannel() {
         NotificationChannel channel = createNotificationChannel(PUBLIC_CHANNEL, NotificationManager.IMPORTANCE_LOW);
         channel.setShowBadge(true);
-        return new NotificationChannelModel(channel);
+        return channel;
     }
 
-    private NotificationChannelModel createPrivateGroupMessageChannel() {
+    private NotificationChannel createPrivateGroupMessageChannel() {
         NotificationChannel channel = createNotificationChannel(PRIVATE_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT);
         channel.enableLights(true);
         channel.setShowBadge(true);
         channel.setLightColor(Color.BLUE);
-        return new NotificationChannelModel(channel);
+        return channel;
     }
 
-    private NotificationChannelModel createDirectMessageChannel() {
+    private NotificationChannel createDirectMessageChannel() {
         NotificationChannel channel = createNotificationChannel(DIRECT_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
         channel.enableLights(true);
         channel.setShowBadge(true);
         channel.setLightColor(Color.RED);
         channel.setBypassDnd(true);
-        return new NotificationChannelModel(channel);
+        return channel;
     }
 
     private NotificationChannel createNotificationChannel(String name, int importance) {
@@ -107,10 +109,8 @@ public final class NotificationProvider {
                 throw new IllegalStateException("Not Support Channel name.");
         }
 
-        NotificationChannelModel model = channelModelMap.get(currentNotificationChannelName);
-        int newCount = model.getCount() + 1;
-        model.setCount(newCount);
-        channelModelMap.put(currentNotificationChannelName, model);
+        int count = channelCountMap.get(currentNotificationChannelName);
+        channelCountMap.put(currentNotificationChannelName, count + 1);
 
         int totalCount = getTotalNotificaitonCount();
         builder.setNumber(totalCount);
@@ -134,14 +134,14 @@ public final class NotificationProvider {
     }
 
     public void decreaseNotificationCount(String channelName) {
-        NotificationChannelModel model = channelModelMap.get(channelName);
-        model.setCount(model.getCount() - 1);
+        int count = channelCountMap.get(channelName);
+        channelCountMap.put(channelName, count - 1);
     }
 
     public int getTotalNotificaitonCount() {
         int count = 0;
-        for (NotificationChannelModel model : channelModelMap.values()) {
-            count += model.getCount();
+        for (int num: channelCountMap.values()) {
+            count += num;
         }
         return count;
     }
