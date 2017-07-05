@@ -5,15 +5,19 @@ package me.lazmaid.notificationtester;
  */
 
 public class Constants {
+
+    public static final String PUBLIC_CHANNEL = "Public";
+    public static final String PRIVATE_CHANNEL = "Private";
+    public static final String DIRECT_CHANNEL = "Direct";
+
     public static final int SNOOZE_REQ_CODE = 100;
     public static final int REPLY_REQ_CODE = 200;
     public static final int BLOCK_REQ_CODE = 300;
-    public static final int DELETE_NOTIFICATION_REQ_CODE = 500;
 
     public static final String SNZOOE_ACTION = "Snooze";
     public static final String REPLY_ACTION = "Reply";
     public static final String BLOCK_ACTON= "Block";
 
     public static final String REQUEST_CODE = "Request Code";
-    public static final String CHANNEL_NAME = "Channel Name";
+    public static final String NOTIFICATION_ID = "ID";
 }
