@@ -6,10 +6,6 @@ package me.lazmaid.notificationtester;
 
 public class Constants {
 
-    public static final String PUBLIC_CHANNEL = "Public";
-    public static final String PRIVATE_CHANNEL = "Private";
-    public static final String DIRECT_CHANNEL = "Direct";
-
     public static final int SNOOZE_REQ_CODE = 100;
     public static final int REPLY_REQ_CODE = 200;
     public static final int BLOCK_REQ_CODE = 300;
