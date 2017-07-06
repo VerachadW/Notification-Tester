@@ -19,32 +19,34 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivityKt : AppCompatActivity() {
 
-    private var notificationCount = 0
-
-    private val channelModelMap: Map<ChannelKt, NotificationChannel> = mapOf(
+    private val channelModelMap = mapOf(
             ChannelKt.PUBLIC to createNotificationChannel(ChannelKt.PUBLIC),
             ChannelKt.PRIVATE to createNotificationChannel(ChannelKt.PRIVATE),
             ChannelKt.DIRECT to createNotificationChannel(ChannelKt.DIRECT)
     )
 
-    // Will be init later
-    private lateinit var currentChannel: ChannelKt
-
     //Lazy Initialization
     private val notificationManager: NotificationManager by lazy {
-        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-            createNotificationChannels(channelModelMap.values.toList())
-        }
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
+
+    private var notificationCount = 0
+
+    // Will be init later
+    private lateinit var currentChannel: ChannelKt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Set up
+        currentChannel = ChannelKt.values()[0]
+        notificationManager.createNotificationChannels(channelModelMap.values.toList())
+
         // View setup
         channelSpinner.apply {
             adapter = ArrayAdapter<String>(this@MainActivityKt, android.R.layout.simple_spinner_item,
-                    ChannelKt.values().map { it.name.capitalize() })
+                    ChannelKt.values().map { it.displayName })
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(adapterView: AdapterView<*>?) {}
 
@@ -69,19 +71,19 @@ class MainActivityKt : AppCompatActivity() {
     private fun createNotificationChannel(channel: ChannelKt): NotificationChannel {
         return when (channel) {
             ChannelKt.PUBLIC -> {
-                NotificationChannel(ChannelKt.PUBLIC.id, channel.name.capitalize(), NotificationManager.IMPORTANCE_LOW).apply {
+                NotificationChannel(channel.id, channel.displayName, NotificationManager.IMPORTANCE_LOW).apply {
                     setShowBadge(true)
                 }
             }
             ChannelKt.PRIVATE -> {
-                NotificationChannel(ChannelKt.PRIVATE.id, channel.name.capitalize(), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                NotificationChannel(channel.id, channel.displayName, NotificationManager.IMPORTANCE_DEFAULT).apply {
                     enableLights(true)
                     setShowBadge(true)
                     lightColor = Color.BLUE
                 }
             }
             ChannelKt.DIRECT -> {
-                NotificationChannel(ChannelKt.DIRECT.id, channel.name.capitalize(), NotificationManager.IMPORTANCE_HIGH).apply {
+                NotificationChannel(channel.id, channel.displayName, NotificationManager.IMPORTANCE_HIGH).apply {
                     setShowBadge(true)
                     setBypassDnd(true)
                     enableLights(true)
@@ -93,7 +95,7 @@ class MainActivityKt : AppCompatActivity() {
 
     private fun buildNotification(channel: ChannelKt, id: Int, message: String) =
             with(Notification.Builder(this, channel.id)) {
-                setContentTitle(channel.name.capitalize())
+                setContentTitle(channel.displayName)
                 setSmallIcon(R.mipmap.ic_launcher_round)
                 setContentText(message)
 

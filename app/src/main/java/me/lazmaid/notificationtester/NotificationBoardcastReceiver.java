@@ -10,10 +10,10 @@ public class NotificationBoardcastReceiver extends BroadcastReceiver {
 
     @Override public void onReceive(Context context, Intent intent) {
         if (intent != null) {
-            String action = "";
             int requestConde = intent.getIntExtra(Constants.REQUEST_CODE, 0);
             int notificationId = intent.getIntExtra(Constants.NOTIFICATION_ID, 0);
 
+            String action;
             switch (requestConde) {
                 case Constants.SNOOZE_REQ_CODE:
                     action = Constants.SNZOOE_ACTION;
@@ -24,6 +24,8 @@ public class NotificationBoardcastReceiver extends BroadcastReceiver {
                 case Constants.REPLY_REQ_CODE:
                     action = Constants.REPLY_ACTION;
                     break;
+                default:
+                    action = "";
             }
 
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

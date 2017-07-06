@@ -1,9 +1,9 @@
 package me.lazmaid.notificationtester
 
-enum class ChannelKt {
-    PUBLIC,
-    PRIVATE,
-    DIRECT;
+enum class ChannelKt(val displayName: String) {
+    PUBLIC("Public"),
+    PRIVATE("Private"),
+    DIRECT("Direct");
 
     val id: String
         get() = "${name.toLowerCase()}-channel"

@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Notification Message is Empty", Toast.LENGTH_SHORT).show();
                 } else {
                     notificationCount++;
-                    Notification notification = buildNotification(currentChannel, notificationCount,
-                            messageView.getText().toString());
+                    Notification notification = buildNotification(currentChannel, notificationCount, text);
                     notificationManager.notify(notificationCount, notification);
                 }
             }
@@ -95,33 +94,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Notification buildNotification(Channel currentChannel, int id, String text) {
-        Notification.Builder builder = new Notification.Builder(this, currentChannel.getChannelId());
+    private Notification buildNotification(Channel channel, int id, String message) {
+        Notification.Builder builder = new Notification.Builder(this, channel.getChannelId());
 
-        builder.setContentTitle(currentChannel.toCapitalizeName())
+        builder.setContentTitle(channel.getDisplayName())
                .setSmallIcon(R.mipmap.ic_launcher_round)
-               .setContentText(text);
+               .setContentText(message);
 
-        switch (currentChannel) {
+        switch (channel) {
             case PUBLIC:
             case PRIVATE:
-                builder.addAction(createAction(Constants.SNOOZE_REQ_CODE, id, R.drawable.ic_snooze_black_24dp,
+                builder.addAction(buildAction(Constants.SNOOZE_REQ_CODE, id, R.drawable.ic_snooze_black_24dp,
                         Constants.SNZOOE_ACTION));
                 break;
             case DIRECT:
-                builder.addAction(createAction(Constants.REPLY_REQ_CODE, id, R.drawable.ic_reply_black_24dp,
+                builder.addAction(buildAction(Constants.REPLY_REQ_CODE, id, R.drawable.ic_reply_black_24dp,
                         Constants.REPLY_ACTION));
-                builder.addAction(createAction(Constants.BLOCK_REQ_CODE, id, R.drawable.ic_block_black_24dp, Constants.BLOCK_ACTON));
+                builder.addAction(buildAction(Constants.BLOCK_REQ_CODE, id, R.drawable.ic_block_black_24dp,
+                        Constants.BLOCK_ACTON));
                 break;
         }
 
         return builder.build();
     }
 
+    private Notification.Action buildAction(int requestCode, int notificaitonId, @DrawableRes int iconId, String actionName) {
+        Intent intent = new Intent(this, NotificationBoardcastReceiver.class);
+        intent.setAction(actionName);
+        intent.putExtra(Constants.NOTIFICATION_ID, notificaitonId);
+        intent.putExtra(Constants.REQUEST_CODE, requestCode);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        Icon icon = Icon.createWithResource(this, iconId);
+        return new Notification.Action.Builder(icon, actionName, pendingIntent)
+                .build();
+    }
+
     private String[] getChannelNames() {
         String[] channelNames = new String[Channel.values().length];
         for (int i = 0; i < Channel.values().length; i++) {
-            channelNames[i] = Channel.values()[i].toCapitalizeName();
+            channelNames[i] = Channel.values()[i].getDisplayName();
         }
         return channelNames;
     }
@@ -131,17 +143,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private NotificationChannel createPublicGroupMessageChannel() {
-        String id = currentChannel.getChannelId();
-        NotificationChannel channel = new NotificationChannel(id, Channel.PUBLIC.toCapitalizeName(),
-                NotificationManager.IMPORTANCE_LOW);
+        String id = Channel.PUBLIC.getChannelId();
+        String displayName = Channel.PUBLIC.getDisplayName();
+        NotificationChannel channel = new NotificationChannel(id, displayName, NotificationManager.IMPORTANCE_LOW);
         channel.setShowBadge(true);
         return channel;
     }
 
     private NotificationChannel createPrivateGroupMessageChannel() {
-        String id = currentChannel.getChannelId();
-        NotificationChannel channel = new NotificationChannel(id, Channel.PRIVATE.toCapitalizeName(),
-                NotificationManager.IMPORTANCE_DEFAULT);
+        String id = Channel.PRIVATE.getChannelId();
+        String displayName = Channel.PRIVATE.getDisplayName();
+        NotificationChannel channel = new NotificationChannel(id, displayName, NotificationManager.IMPORTANCE_DEFAULT);
         channel.enableLights(true);
         channel.setShowBadge(true);
         channel.setLightColor(Color.BLUE);
@@ -150,23 +162,12 @@ public class MainActivity extends AppCompatActivity {
 
     private NotificationChannel createDirectMessageChannel() {
         String id = currentChannel.getChannelId();
-        NotificationChannel channel = new NotificationChannel(id, Channel.DIRECT.toCapitalizeName(),
-                NotificationManager.IMPORTANCE_HIGH);
-        channel.enableLights(true);
-        channel.setShowBadge(true);
-        channel.setLightColor(Color.RED);
+        String displayName = Channel.PRIVATE.getDisplayName();
+        NotificationChannel channel = new NotificationChannel(id, displayName, NotificationManager.IMPORTANCE_HIGH);
         channel.setBypassDnd(true);
+        channel.setShowBadge(true);
+        channel.enableLights(true);
+        channel.setLightColor(Color.RED);
         return channel;
-    }
-
-    private Notification.Action createAction(int requestCode, int notificaitonId, @DrawableRes int iconId, String action) {
-        Intent intent = new Intent(this, NotificationBoardcastReceiver.class);
-        intent.setAction(action);
-        intent.putExtra(Constants.NOTIFICATION_ID, notificaitonId);
-        intent.putExtra(Constants.REQUEST_CODE, requestCode);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        Icon icon = Icon.createWithResource(this, iconId);
-        return new Notification.Action.Builder(icon, action, pendingIntent)
-                .build();
     }
 }

@@ -1,12 +1,18 @@
 package me.lazmaid.notificationtester;
 
 public enum Channel {
-    PUBLIC,
-    PRIVATE,
-    DIRECT;
+    PUBLIC("Public"),
+    PRIVATE("Private"),
+    DIRECT("Direct");
 
-    public String toCapitalizeName() {
-        return name().charAt(0) + name().substring(1).toLowerCase();
+    private final String displayName;
+
+    Channel(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public String getChannelId() {
